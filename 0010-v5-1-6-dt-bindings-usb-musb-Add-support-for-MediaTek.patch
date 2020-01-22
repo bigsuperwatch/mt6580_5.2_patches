@@ -1,0 +1,74 @@
+From 80e549106d8ca7904e19dbd19d3f87d4c5efc84d Mon Sep 17 00:00:00 2001
+From: bigsupersquid <bigsupersquid@gmail.com>
+Date: Sun, 26 May 2019 08:35:01 -0500
+Subject: [PATCH] [v5,1/6] dt-bindings: usb: musb: Add support for MediaTek
+ musb controller
+
+---
+ .../devicetree/bindings/usb/mediatek,musb.txt      | 54 ++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/usb/mediatek,musb.txt
+
+diff --git a/Documentation/devicetree/bindings/usb/mediatek,musb.txt b/Documentation/devicetree/bindings/usb/mediatek,musb.txt
+new file mode 100644
+index 0000000..f7b98fd
+--- /dev/null
++++ b/Documentation/devicetree/bindings/usb/mediatek,musb.txt
+@@ -0,0 +1,54 @@
++MediaTek musb DRD/OTG controller
++-------------------------------------------
++
++Required properties:
++ - compatible      : should be one of:
++                     "mediatek,mt-2701"
++                     "mediatek,mt-6580"
++                     ...
++                     followed by "mediatek,mtk-musb"
++ - reg             : specifies physical base address and size of
++                     the registers
++ - interrupts      : interrupt used by musb controller
++ - interrupt-names : must be "mc"
++ - phys            : PHY specifier for the OTG phy
++ - dr_mode         : should be one of "host", "peripheral" or "otg",
++                     refer to usb/generic.txt
++ - clocks          : a list of phandle + clock-specifier pairs, one for
++                     each entry in clock-names
++ - clock-names     : must contain "main", "mcu", "univpll"
++                     for clocks of controller
++
++Optional properties:
++ - power-domains   : a phandle to USB power domain node to control USB's
++                     MTCMOS
++
++Required child nodes:
++ usb connector node as defined in bindings/connector/usb-connector.txt
++ - extcon          : for VBUS and ID pin changes detection, needed when
++                     supports dual-role mode
++ - vbus-supply     : reference to the VBUS regulator, needed when supports
++                     dual-role mode
++
++Example:
++
++usb2: usb@11200000 {
++	compatible = "mediatek,mt2701-musb",
++		     "mediatek,mtk-musb";
++	reg = <0 0x11200000 0 0x1000>;
++	interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_LOW>;
++	interrupt-names = "mc";
++	phys = <&u2port2 PHY_TYPE_USB2>;
++	dr_mode = "otg";
++	clocks = <&pericfg CLK_PERI_USB0>,
++		 <&pericfg CLK_PERI_USB0_MCU>,
++		 <&pericfg CLK_PERI_USB_SLV>;
++	clock-names = "main","mcu","univpll";
++	power-domains = <&scpsys MT2701_POWER_DOMAIN_IFR_MSC>;
++	usb_con: connector{
++		compatible = "usb-b-connector";
++		label = "micro-USB";
++		type = "micro";
++		extcon = <&extcon_usb>;
++		vbus-supply = <&usb_vbus>;
++	};
+-- 
+1.9.1
+

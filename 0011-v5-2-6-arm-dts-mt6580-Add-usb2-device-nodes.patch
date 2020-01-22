@@ -1,0 +1,155 @@
+From 8428934838a4d7bcd4e3f327fc99e85533997d36 Mon Sep 17 00:00:00 2001
+From: bigsupersquid <bigsupersquid@gmail.com>
+Date: Sun, 26 May 2019 08:45:46 -0500
+Subject: [PATCH] [v5,2/6] arm: dts: mt6580: Add usb2 device nodes
+
+---
+ arch/arm/boot/dts/mt6580-s8pro.dts | 64 ++++++++++++++------------------------
+ arch/arm/boot/dts/mt6580.dtsi      | 37 ++++++++++++++++++++++
+ 2 files changed, 61 insertions(+), 40 deletions(-)
+
+diff --git a/arch/arm/boot/dts/mt6580-s8pro.dts b/arch/arm/boot/dts/mt6580-s8pro.dts
+index 931e126..42f9db0 100644
+--- a/arch/arm/boot/dts/mt6580-s8pro.dts
++++ b/arch/arm/boot/dts/mt6580-s8pro.dts
+@@ -7,7 +7,7 @@
+ 
+ /dts-v1/;
+ #include "mt6580.dtsi"
+-#include <dt-bindings/phy/phy.h>
++#include <dt-bindings/gpio/gpio.h>
+ 
+ / {
+ 	model = "MediaTek MT6580 ZGPAX s8pro";
+@@ -116,48 +116,21 @@
+             interrupts = <0x0 0x4 0x4>;
+ 	};
+ */
+-    
+-	usb0: usb@11100000 {
+-		compatible = "mediatek,mt7623-xhci",
+-				"mediatek,mt8173-xhci";
+-		reg = <0 0x11100000 0 0x10000>,
+-			<0 0x11100000 0 0x10000>;
+-		reg-names = "mac", "ippc";
+-//		interrupts = <GIC_SPI 196 IRQ_TYPE_LEVEL_LOW>;
+-//		clocks = <&hifsys CLK_HIFSYS_USB0PHY>,
+-//			<&topckgen CLK_TOP_ETHIF_SEL>;
+-//		clock-names = "sys_ck", "ref_ck";
+-//		power-domains = <&scpsys MT2701_POWER_DOMAIN_HIF>;
+-		phys = <&u2port0 PHY_TYPE_USB2>, <&u3port0 PHY_TYPE_USB3>;
+-		status = "disabled";
+-	};
+ 
+-	u3phy0: usb-phy@11100000 {
+-		compatible = "mediatek,mt7623-u3phy",
+-			     "mediatek,mt2701-u3phy";
+-		reg = <0 0x11100000 0 0x10000>;
+-		#address-cells = <2>;
+-		#size-cells = <2>;
+-		ranges;
+-		status = "disabled";
+-
+-		u2port0: usb-phy@11100800 {
+-			reg = <0 0x11100800 0 0x01000>;
+-//			clocks = <&topckgen CLK_TOP_USB_PHY48M>;
+-//			clock-names = "ref";
+-			#phy-cells = <1>;
+-			status = "okay";
+-		};
+-
+-		u3port0: usb-phy@11100900 {
+-			reg = <0 0x11100900 0 0x10000>;
+-//			clocks = <&clk26m>;
+-//			clock-names = "ref";
+-			#phy-cells = <1>;
+-			status = "okay";
+-		};
++	extcon_usb: extcon_iddig {
++		compatible = "linux,extcon-usb-gpio";
++		id-gpio = <&pio 44 GPIO_ACTIVE_HIGH>;
+ 	};
+ 
++	usb_vbus: regulator@0 {
++		compatible = "regulator-fixed";
++		regulator-name = "usb_vbus";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		gpio = <&pio 45 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++	
+ 	memory {
+ 		device_type = "memory";
+ 		reg = <0x80000000 0x20000000>;
+@@ -167,3 +140,14 @@
+ &uart0 {
+ 	status = "okay";
+ };
++
++&usb2 {
++	status = "okay";
++	usb_con: connector{
++		compatible = "usb-b-connector";
++		label = "micro-USB";
++		type = "micro";
++		extcon = <&extcon_usb>;
++		vbus-supply = <&usb_vbus>;
++	};
++};
+diff --git a/arch/arm/boot/dts/mt6580.dtsi b/arch/arm/boot/dts/mt6580.dtsi
+index 2c1057f..d90bc71 100644
+--- a/arch/arm/boot/dts/mt6580.dtsi
++++ b/arch/arm/boot/dts/mt6580.dtsi
+@@ -7,6 +7,9 @@
+ 
+ #include <dt-bindings/interrupt-controller/irq.h>
+ #include <dt-bindings/interrupt-controller/arm-gic.h>
++#include <dt-bindings/clock/mt2701-clk.h>
++#include <dt-bindings/phy/phy.h>
++#include <dt-bindings/power/mt2701-power.h>
+ 
+ / {
+ 	compatible = "mediatek,mt6580";
+@@ -118,4 +121,38 @@
+ 		clocks = <&uart_clk>;
+ 		status = "disabled";
+ 	};
++
++	usb2: usb@11100000 {
++		compatible = "mediatek,mt6580-musb",
++			     "mediatek,mtk-musb";
++		reg = <0 0x11100000 0 0x1000>;
++		interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_LOW>;
++		interrupt-names = "mc";
++		phys = <&u2port2 PHY_TYPE_USB2>;
++		dr_mode = "otg";
++		clocks = <&pericfg CLK_PERI_USB0>,
++			 <&pericfg CLK_PERI_USB0_MCU>,
++			 <&pericfg CLK_PERI_USB_SLV>;
++		clock-names = "main","mcu","univpll";
++		power-domains = <&scpsys MT2701_POWER_DOMAIN_IFR_MSC>;
++		status = "disabled";
++	};
++
++	u2phy0: usb-phy@11110000 {
++		compatible = "mediatek,generic-tphy-v1";
++		reg = <0 0x11110000 0 0x0800>;
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++		status = "okay";
++
++		u2port2: usb-phy@1a1c4800 {
++			reg = <0 0x11110800 0 0x0100>;
++			clocks = <&topckgen CLK_TOP_USB_PHY48M>;
++			clock-names = "ref";
++			#phy-cells = <1>;
++			status = "okay";
++		};
++	};
++
+ };
+-- 
+1.9.1
+

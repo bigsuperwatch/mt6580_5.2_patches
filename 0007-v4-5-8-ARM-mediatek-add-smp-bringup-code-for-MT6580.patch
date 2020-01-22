@@ -1,0 +1,70 @@
+From 692091ddeb6268cc360d0e14721202ef5f219a39 Mon Sep 17 00:00:00 2001
+From: bigsupersquid <bigsupersquid@gmail.com>
+Date: Sun, 26 May 2019 06:02:09 -0500
+Subject: [PATCH] [v4,5/8] ARM: mediatek: add smp bringup code for MT6580
+
+---
+ arch/arm/boot/dts/mt6580.dtsi | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/arch/arm/boot/dts/mt6580.dtsi b/arch/arm/boot/dts/mt6580.dtsi
+index 9e17698..2c1057f 100644
+--- a/arch/arm/boot/dts/mt6580.dtsi
++++ b/arch/arm/boot/dts/mt6580.dtsi
+@@ -17,26 +17,31 @@
+ 	cpus {
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
++		enable-method = "mediatek,mt6580-smp";
+ 
+ 		cpu@0 {
+ 			device_type = "cpu";
+ 			compatible = "arm,cortex-a7";
+ 			reg = <0x0>;
++			clock-frequency = <1700000000>;
+ 		};
+ 		cpu@1 {
+ 			device_type = "cpu";
+ 			compatible = "arm,cortex-a7";
+ 			reg = <0x1>;
++			clock-frequency = <1700000000>;
+ 		};
+ 		cpu@2 {
+ 			device_type = "cpu";
+ 			compatible = "arm,cortex-a7";
+ 			reg = <0x2>;
++			clock-frequency = <1700000000>;
+ 		};
+ 		cpu@3 {
+ 			device_type = "cpu";
+ 			compatible = "arm,cortex-a7";
+ 			reg = <0x3>;
++			clock-frequency = <1700000000>;
+ 		};
+ 
+ 	};
+@@ -59,6 +64,12 @@
+ 		#clock-cells = <0>;
+ 	};
+ 
++	scpsys: scpsys@10006000 {
++		#power-domain-cells = <1>;
++		compatible = "mediatek,mt6580-scpsys";
++		reg = <0x10006000 0x1000>;
++	};
++
+ 	timer: timer@10008000 {
+ 		compatible = "mediatek,mt6580-timer",
+ 			     "mediatek,mt6577-timer";
+@@ -66,6 +77,8 @@
+ 		interrupts = <GIC_SPI 92 IRQ_TYPE_LEVEL_LOW>;
+ 		clocks = <&system_clk>, <&rtc_clk>;
+ 		clock-names = "system-clk", "rtc-clk";
++		clock-frequency = <13000000>;
++		arm,cpu-registers-not-fw-configured;
+ 	};
+ 
+ 	sysirq: interrupt-controller@10200100 {
+-- 
+1.9.1
+

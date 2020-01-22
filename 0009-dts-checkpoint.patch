@@ -1,0 +1,77 @@
+From ccc96340e6dc4ab0702fd1d3382c6acb1a2d0eb1 Mon Sep 17 00:00:00 2001
+From: bigsupersquid <bigsupersquid@gmail.com>
+Date: Sun, 26 May 2019 06:29:31 -0500
+Subject: [PATCH] dts checkpoint
+
+---
+ arch/arm/boot/dts/mt6580-s8pro.dts | 32 ++++----------------------------
+ 1 file changed, 4 insertions(+), 28 deletions(-)
+
+diff --git a/arch/arm/boot/dts/mt6580-s8pro.dts b/arch/arm/boot/dts/mt6580-s8pro.dts
+index e960407..931e126 100644
+--- a/arch/arm/boot/dts/mt6580-s8pro.dts
++++ b/arch/arm/boot/dts/mt6580-s8pro.dts
+@@ -109,30 +109,6 @@
+             clock-frequency = <0x6553f100>;
+         };
+     };
+-
+-		usb0:USB0@0x11100000 {
+-			compatible = "mediatek,USB0";
+-			cell-index = <0>;
+-			reg = <0x11100000 0x10000>,
+-						<0x11110000 0x10000>;
+-			interrupts = <0 32 0x8>;
+-			mode = <2>;
+-			multipoint = <1>;
+-			dyn_fifo = <1>;
+-			soft_con = <1>;
+-			dma = <1>;
+-			num_eps = <16>;
+-			dma_channels = <8>;
+-			iddig_gpio = <9 3>;
+-			drvvbus_gpio = <10 3>;
+-			usbiddig:usbiddig {
+-				compatible = "mediatek,usb_iddig_eint";
+-			};
+-		};
+-
+-		usbphy0: usbphy@0 {
+-			compatible = "usb-nop-xceiv";
+-		};
+ /*
+ 	usb0: usb@11100000 {
+ 		compatible = "generic-xhci";
+@@ -140,9 +116,9 @@
+             interrupts = <0x0 0x4 0x4>;
+ 	};
+ */
+-/*    
++    
+ 	usb0: usb@11100000 {
+-		compatible = "mediatek,mt6580-xhci",
++		compatible = "mediatek,mt7623-xhci",
+ 				"mediatek,mt8173-xhci";
+ 		reg = <0 0x11100000 0 0x10000>,
+ 			<0 0x11100000 0 0x10000>;
+@@ -157,7 +133,7 @@
+ 	};
+ 
+ 	u3phy0: usb-phy@11100000 {
+-		compatible = "mediatek,mt6580-u3phy",
++		compatible = "mediatek,mt7623-u3phy",
+ 			     "mediatek,mt2701-u3phy";
+ 		reg = <0 0x11100000 0 0x10000>;
+ 		#address-cells = <2>;
+@@ -181,7 +157,7 @@
+ 			status = "okay";
+ 		};
+ 	};
+-*/
++
+ 	memory {
+ 		device_type = "memory";
+ 		reg = <0x80000000 0x20000000>;
+-- 
+1.9.1
+

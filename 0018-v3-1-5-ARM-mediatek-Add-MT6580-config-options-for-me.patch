@@ -1,0 +1,51 @@
+From 664fda0e99c5f4902f1bc0ca677931175330a6df Mon Sep 17 00:00:00 2001
+From: bigsupersquid <bigsupersquid@gmail.com>
+Date: Thu, 30 May 2019 17:58:04 -0500
+Subject: [PATCH] [v3,1/5] ARM: mediatek: Add MT6580 config options for
+ mediatek SoCs.
+
+---
+ arch/arm/mach-mediatek/Kconfig    | 4 ++++
+ arch/arm/mach-mediatek/mediatek.c | 4 +++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/mach-mediatek/Kconfig b/arch/arm/mach-mediatek/Kconfig
+index 11ed264..fa364f3 100644
+--- a/arch/arm/mach-mediatek/Kconfig
++++ b/arch/arm/mach-mediatek/Kconfig
+@@ -14,6 +14,10 @@ config MACH_MT2701
+ 	bool "MediaTek MT2701 SoCs support"
+ 	default ARCH_MEDIATEK
+ 
++config MACH_MT6580
++	bool "MediaTek MT6580 SoCs support"
++	default ARCH_MEDIATEK
++
+ config MACH_MT6589
+ 	bool "MediaTek MT6589 SoCs support"
+ 	default ARCH_MEDIATEK
+diff --git a/arch/arm/mach-mediatek/mediatek.c b/arch/arm/mach-mediatek/mediatek.c
+index 5a9c016..6b35c4e 100644
+--- a/arch/arm/mach-mediatek/mediatek.c
++++ b/arch/arm/mach-mediatek/mediatek.c
+@@ -29,7 +29,8 @@ static void __init mediatek_timer_init(void)
+ {
+ 	void __iomem *gpt_base;
+ 
+-	if (of_machine_is_compatible("mediatek,mt6589") ||
++	if (of_machine_is_compatible("mediatek,mt6580") ||
++	    of_machine_is_compatible("mediatek,mt6589") ||
+ 	    of_machine_is_compatible("mediatek,mt7623") ||
+ 	    of_machine_is_compatible("mediatek,mt8135") ||
+ 	    of_machine_is_compatible("mediatek,mt8127")) {
+@@ -47,6 +48,7 @@ static void __init mediatek_timer_init(void)
+ 
+ static const char * const mediatek_board_dt_compat[] = {
+ 	"mediatek,mt2701",
++	"mediatek,mt6580",
+ 	"mediatek,mt6589",
+ 	"mediatek,mt6592",
+ 	"mediatek,mt7623",
+-- 
+1.9.1
+
